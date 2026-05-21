@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FM1 – Mediación Civil · Ley 7.844 · P.J. Tucumán</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.min.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f2f5;min-height:100vh;padding:16px}
+  .container{max-width:720px;margin:0 auto}
+  h1{text-align:center;color:#1a3a6b;font-size:1.2rem;margin-bottom:4px}
+  .subtitle{text-align:center;color:#555;font-size:.82rem;margin-bottom:18px}
+  /* Steps */
+  .steps{display:flex;justify-content:space-between;margin-bottom:22px;position:relative}
+  .steps::before{content:'';position:absolute;top:18px;left:10%;right:10%;height:2px;background:#d0d7e3;z-index:0}
+  .step{display:flex;flex-direction:column;align-items:center;z-index:1;width:25%}
+  .step-circle{width:36px;height:36px;border-radius:50%;background:#d0d7e3;color:#888;font-weight:700;font-size:.95rem;display:flex;align-items:center;justify-content:center;transition:.3s}
+  .step-label{font-size:.68rem;color:#888;margin-top:4px;text-align:center}
+  .step.active .step-circle{background:#1a3a6b;color:#fff}
+  .step.done .step-circle{background:#27ae60;color:#fff}
+  .step.active .step-label,.step.done .step-label{color:#1a3a6b;font-weight:600}
+  /* Card */
+  .card{background:#fff;border-radius:10px;padding:22px;box-shadow:0 2px 8px rgba(0,0,0,.1);margin-bottom:16px}
+  .card h2{color:#1a3a6b;font-size:1rem;margin-bottom:16px;border-bottom:2px solid #e8edf5;padding-bottom:8px}
+  /* Form */
+  label{display:block;font-size:.82rem;font-weight:600;color:#444;margin-bottom:4px;margin-top:12px}
+  label:first-of-type{margin-top:0}
+  input,select,textarea{width:100%;padding:9px 11px;border:1.5px solid #ccd3e0;border-radius:6px;font-size:.88rem;font-family:inherit;transition:border .2s}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:#1a3a6b}
+  textarea{resize:vertical;min-height:70px}
+  .row{display:flex;gap:10px}
+  .row>div{flex:1}
+  /* Blocks */
+  .block{border:1.5px solid #dde3ee;border-radius:8px;padding:14px;margin-bottom:10px;position:relative;background:#fafbfe}
+  .block-title{font-weight:700;font-size:.82rem;color:#1a3a6b;margin-bottom:10px}
+  .remove-btn{position:absolute;top:10px;right:10px;background:none;border:none;color:#c0392b;cursor:pointer;font-size:1.1rem;line-height:1;padding:2px 6px}
+  .remove-btn:hover{background:#fdecea;border-radius:4px}
+  .add-btn{display:flex;align-items:center;gap:6px;background:none;border:2px dashed #1a3a6b;color:#1a3a6b;padding:8px 14px;border-radius:7px;cursor:pointer;font-size:.85rem;font-weight:600;width:100%;justify-content:center;margin-top:4px;transition:.2s}
+  .add-btn:hover{background:#eef2fb}
+  /* Nav buttons */
+  .nav{display:flex;justify-content:space-between;margin-top:18px;gap:10px}
+  .btn{padding:10px 22px;border-radius:7px;font-size:.9rem;font-weight:600;cursor:pointer;border:none;transition:.2s}
+  .btn-primary{background:#1a3a6b;color:#fff}
+  .btn-primary:hover{background:#16306a}
+  .btn-secondary{background:#e8edf5;color:#1a3a6b}
+  .btn-secondary:hover{background:#d5ddef}
+  .btn-success{background:#27ae60;color:#fff;flex:1}
+  .btn-success:hover{background:#219a54}
+  .btn-new{background:#e67e22;color:#fff}
+  .btn-new:hover{background:#d16d1a}
+  /* Select con grupo */
+  .select-wrap{position:relative}
+  .manual-toggle{font-size:.75rem;color:#1a3a6b;cursor:pointer;text-decoration:underline;margin-top:4px;display:inline-block}
+  .manual-fields{margin-top:8px}
+  /* Requerido group */
+  .req-group-badge{display:inline-block;background:#e8edf5;color:#1a3a6b;font-size:.7rem;font-weight:700;padding:2px 7px;border-radius:10px;margin-bottom:6px}
+  /* Success */
+  #successPanel{display:none;text-align:center;padding:30px 20px}
+  #successPanel .icon{font-size:3rem;margin-bottom:12px}
+  #successPanel h2{color:#27ae60;margin-bottom:8px}
+  #successPanel p{color:#555;font-size:.88rem;margin-bottom:20px}
+  .btn-dl{display:inline-flex;align-items:center;gap:8px;background:#1a3a6b;color:#fff;padding:11px 24px;border-radius:7px;text-decoration:none;font-weight:600;cursor:pointer;border:none;font-size:.92rem}
+  .btn-dl:hover{background:#16306a}
+  /* Checkbox row */
+  .check-row{display:flex;align-items:flex-start;gap:8px;margin-top:10px}
+  .check-row input[type=checkbox]{width:auto;margin-top:3px}
+  .check-row label{font-weight:400;font-size:.82rem;margin:0}
+  /* Helper */
+  .helper{font-size:.74rem;color:#888;margin-top:3px}
+  @media(max-width:500px){
+    .row{flex-direction:column;gap:0}
+    .steps::before{left:5%;right:5%}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Centro de Mediación Judicial</h1>
+  <p class="subtitle">Formulario FM1 · Ley 7.844 · Poder Judicial de Tucumán</p>
+
+  <!-- Progress -->
+  <div class="steps">
+    <div class="step active" id="s1"><div class="step-circle">1</div><div class="step-label">Requirente</div></div>
+    <div class="step" id="s2"><div class="step-circle">2</div><div class="step-label">Abogado</div></div>
+    <div class="step" id="s3"><div class="step-circle">3</div><div class="step-label">Requerido</div></div>
+    <div class="step" id="s4"><div class="step-circle">4</div><div class="step-label">Proceso</div></div>
+  </div>
+
+  <!-- PASO 1: REQUIRENTE -->
+  <div class="card" id="step1">
+    <h2>Datos del Requirente</h2>
+    <div id="requirenteList"></div>
+    <button class="add-btn" onclick="addRequirente()">＋ Agregar requirente</button>
+    <div class="nav">
+      <div></div>
+      <button class="btn btn-primary" onclick="goStep(2)">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- PASO 2: ABOGADO -->
+  <div class="card" id="step2" style="display:none">
+    <h2>Datos del Abogado</h2>
+    <label>Abogado</label>
+    <select id="abogadoSelect" onchange="onAbogadoChange()">
+      <option value="">— Seleccionar —</option>
+      <option value="manual">Ingresar manualmente</option>
+      <optgroup label="Abogados del estudio">
+        <option value="0">Dr. Francisco José Nader Zelaya (Mat. 4894)</option>
+        <option value="1">Dr. Hugo Gustavo Rubio (Mat. 4619)</option>
+        <option value="2">Dra. María Gabriela Rolandi (Mat. 4406)</option>
+      </optgroup>
+    </select>
+    <div id="abogadoManual" class="manual-fields" style="display:none">
+      <div class="row">
+        <div>
+          <label>Título</label>
+          <select id="abogTitulo">
+            <option value="Dr.">Dr.</option>
+            <option value="Dra.">Dra.</option>
+          </select>
+        </div>
+        <div style="flex:3">
+          <label>Nombre y Apellido</label>
+          <input type="text" id="abogNombre" placeholder="Nombre completo">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Matrícula</label>
+          <input type="text" id="abogMat" placeholder="Ej: 4894">
+        </div>
+        <div>
+          <label>Libro/Folio</label>
+          <input type="text" id="abogLibro" placeholder="Ej: LºK Fº385">
+        </div>
+        <div>
+          <label>Casillero</label>
+          <input type="text" id="abogCasillero" placeholder="Ej: 20-23117204-2">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Celular</label>
+          <input type="text" id="abogCelular" placeholder="3814062774">
+        </div>
+        <div>
+          <label>Email</label>
+          <input type="email" id="abogEmail" placeholder="abogado@mail.com">
+        </div>
+      </div>
+    </div>
+    <label>Carácter</label>
+    <select id="abogCaracter">
+      <option value="Apoderado">Apoderado</option>
+      <option value="Patrocinante">Patrocinante</option>
+    </select>
+    <div class="nav">
+      <button class="btn btn-secondary" onclick="goStep(1)">← Anterior</button>
+      <button class="btn btn-primary" onclick="goStep(3)">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- PASO 3: REQUERIDO -->
+  <div class="card" id="step3" style="display:none">
+    <h2>Datos del Requerido</h2>
+    <div id="requeridoList"></div>
+    <button class="add-btn" onclick="addRequerido()">＋ Agregar requerido</button>
+    <div class="nav">
+      <button class="btn btn-secondary" onclick="goStep(2)">← Anterior</button>
+      <button class="btn btn-primary" onclick="goStep(4)">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- PASO 4: PROCESO -->
+  <div class="card" id="step4" style="display:none">
+    <h2>Información sobre el Proceso</h2>
+    <label>Fuero</label>
+    <input type="text" id="fuero" value="Civil y Comercial Común">
+    <label>Objeto (procesal)</label>
+    <input type="text" id="objeto" value="Proceso de consumo">
+    <label>Causa (motivo del reclamo)</label>
+    <div class="select-wrap">
+      <select id="motivoSelect" onchange="onMotivoChange()">
+        <option value="">— Seleccionar causa —</option>
+        <option value="Falta deber de información">Falta deber de información</option>
+        <option value="Incumplimiento contractual">Incumplimiento contractual</option>
+        <option value="Daños y perjuicios">Daños y perjuicios</option>
+        <option value="Cobro de pesos">Cobro de pesos</option>
+        <option value="Práctica abusiva">Práctica abusiva</option>
+        <option value="Publicidad engañosa">Publicidad engañosa</option>
+        <option value="otro">Otra causa (ingresar manualmente)…</option>
+      </select>
+      <input type="text" id="motivoLibre" placeholder="Describí la causa…" style="display:none;margin-top:8px">
+    </div>
+    <label>Monto estimado reclamado <span style="font-weight:400;color:#888">(opcional)</span></label>
+    <input type="text" id="monto" placeholder="Ej: $500.000">
+    <label>Observaciones</label>
+    <textarea id="observaciones" rows="3">Se solicita se otorgue beneficio art. 53 ley 24.240 por tratarse de Proceso de Consumo.</textarea>
+    <div class="check-row">
+      <input type="checkbox" id="declaro" checked>
+      <label for="declaro">Declaro que los datos consignados son correctos y completos y que no se ha omitido ni falseado información que deba contener esta declaración.</label>
+    </div>
+    <div class="nav">
+      <button class="btn btn-secondary" onclick="goStep(3)">← Anterior</button>
+      <button class="btn btn-success" onclick="generarDocx()">⬇ Generar FM1.docx</button>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="card" id="successPanel">
+    <div class="icon">✅</div>
+    <h2>¡Formulario generado!</h2>
+    <p>El archivo <strong>FM1_Mediacion_Civil.docx</strong> se descargó automáticamente.</p>
+    <button class="btn-dl" id="btnRedescargar">⬇ Descargar nuevamente</button>
+    <br><br>
+    <button class="btn btn-new" onclick="nuevaMediacion()">🔄 Nueva mediación</button>
+  </div>
+</div>
+
+<script>
+// ─── DATOS ────────────────────────────────────────────────────────────────────
+const ABOGADOS = [
+  { titulo:'Dr.', nombre:'Francisco José Nader Zelaya', mat:'4894', libro:'LºK Fº385', casillero:'20-23117204-2', celular:'3814062774', email:'fjnader@gmail.com' },
+  { titulo:'Dr.', nombre:'Hugo Gustavo Rubio',          mat:'4619', libro:'LºK Fº110', casillero:'20-23518325-1', celular:'',           email:'' },
+  { titulo:'Dra.',nombre:'María Gabriela Rolandi',      mat:'4406', libro:'LºJ Fº397', casillero:'23-25735447-4', celular:'',           email:'' },
+];
+
+const REQUERIDOS_GRUPOS = [
+  { grupo:'FCA / Stellantis', items:[
+    { razon:'FCA S.A. DE AHORROS PARA FINES DETERMINADOS',  cuit:'30-69223905-5', dom:'CARLOS MARÍA DELLA PAOLERA 265 PISO 22', loc:'Ciudad Autónoma de Buenos Aires', cp:'1001' },
+    { razon:'FCA AUTOMOBILES ARGENTINA S.A.',               cuit:'30-68245096-3', dom:'CARLOS MARÍA DELLA PAOLERA 265 PISO 22', loc:'Ciudad Autónoma de Buenos Aires', cp:'1001' },
+  ]},
+  { grupo:'Volkswagen', items:[
+    { razon:'VOLKSWAGEN SA DE AHORRO PARA FINES DETERMINADOS', cuit:'30-56133268-8', dom:'MAIPU 267 PISO 11',           loc:'Ciudad Autónoma de Buenos Aires', cp:'1087' },
+    { razon:'VOLKSWAGEN ARGENTINA SA',                         cuit:'30-50401884-5', dom:'AV. DE LAS INDUSTRIAS 3101',  loc:'Gral Pacheco',                   cp:'1610' },
+  ]},
+  { grupo:'Renault', items:[
+    { razon:'PLAN ROMBO S.A. DE AHORRO PARA FINES DETERMINADOS', cuit:'33-51990129-9', dom:'FRAY JUSTO SANTA MARIA DE ORO 1744', loc:'Ciudad Autónoma de Buenos Aires', cp:'1414' },
+    { razon:'RENAULT ARGENTINA SA',                              cuit:'30-50331781-4', dom:'FRAY JUSTO SANTA MARIA DE ORO 1744', loc:'Ciudad Autónoma de Buenos Aires', cp:'1414' },
+  ]},
+  { grupo:'Chevrolet / GM', items:[
+    { razon:'CHEVROLET S.A. DE AHORROS PARA FINES DETERMINADOS', cuit:'30-68588847-1', dom:'AV. DEL LIBERTADOR 101 PISO 14', loc:'Vicente Lopez', cp:'B1638BEA' },
+    { razon:'GENERAL MOTORS DE ARGENTINA S.R.L.',                cuit:'30-66207168-0', dom:'AV. DEL LIBERTADOR 101 PISO 13', loc:'Vicente Lopez', cp:'B1638BEA' },
+  ]},
+  { grupo:'Peugeot / Citroën', items:[
+    { razon:'CIRCULO DE INVERSORES SAU DE AHORRO PARA FINES DETERMINADOS', cuit:'30-56961810-6', dom:'CARLOS MARÍA DELLA PAOLERA 265 PISO 22', loc:'Ciudad Autónoma de Buenos Aires', cp:'1001' },
+    { razon:'PEUGEOT CITROEN ARGENTINA SA',                                cuit:'30-50474453-8', dom:'CARLOS MARÍA DELLA PAOLERA 265 PISO 22', loc:'Ciudad Autónoma de Buenos Aires', cp:'1001' },
+  ]},
+];
+
+// Flat list con índice para el select
+const REQUERIDOS_FLAT = [];
+REQUERIDOS_GRUPOS.forEach(g => g.items.forEach(r => REQUERIDOS_FLAT.push({ ...r, grupo: g.grupo })));
+
+// ─── ESTADO ───────────────────────────────────────────────────────────────────
+let currentStep = 1;
+let requirentesCount = 0;
+let requeridosCount  = 0;
+let lastBlob = null;
+
+// ─── NAVEGACIÓN ───────────────────────────────────────────────────────────────
+function goStep(n) {
+  if (n > currentStep && !validateStep(currentStep)) return;
+  document.getElementById('step'+currentStep).style.display = 'none';
+  document.getElementById('s'+currentStep).classList.remove('active');
+  document.getElementById('s'+currentStep).classList.add('done');
+  currentStep = n;
+  document.getElementById('step'+n).style.display = 'block';
+  document.getElementById('s'+n).classList.add('active');
+  document.getElementById('s'+n).classList.remove('done');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function validateStep(n) {
+  if (n === 1) {
+    const blocks = document.querySelectorAll('#requirenteList .block');
+    if (!blocks.length) { alert('Agregá al menos un requirente.'); return false; }
+    for (const b of blocks) {
+      const nombre = b.querySelector('.req-nombre').value.trim();
+      const dni    = b.querySelector('.req-dni').value.trim();
+      const dom    = b.querySelector('.req-domicilio').value.trim();
+      if (!nombre || !dni || !dom) { alert('Completá nombre, DNI y domicilio de todos los requirentes.'); return false; }
+    }
+  }
+  if (n === 2) {
+    const sel = document.getElementById('abogadoSelect').value;
+    if (!sel) { alert('Seleccioná o ingresá un abogado.'); return false; }
+    if (sel === 'manual' && !document.getElementById('abogNombre').value.trim()) {
+      alert('Ingresá el nombre del abogado.'); return false;
+    }
+  }
+  if (n === 3) {
+    const blocks = document.querySelectorAll('#requeridoList .block');
+    if (!blocks.length) { alert('Agregá al menos un requerido.'); return false; }
+  }
+  return true;
+}
+
+// ─── REQUIRENTE ───────────────────────────────────────────────────────────────
+function addRequirente() {
+  const id = ++requirentesCount;
+  const div = document.createElement('div');
+  div.className = 'block';
+  div.id = 'reqBlock'+id;
+  div.innerHTML = `
+    <div class="block-title">Requirente ${id}</div>
+    <button class="remove-btn" onclick="removeBlock('reqBlock${id}','requirentesCount')" title="Eliminar">✕</button>
+    <label>Nombre y Apellido</label>
+    <input class="req-nombre" type="text" placeholder="Ej: María Agustina Quiñones">
+    <div class="row">
+      <div><label>DNI</label><input class="req-dni" type="text" placeholder="36.866.666"></div>
+      <div style="flex:2"><label>Domicilio</label><input class="req-domicilio" type="text" placeholder="Calle 123, S.M. de Tucumán"></div>
+    </div>
+    <div class="row">
+      <div><label>Email</label><input class="req-email" type="email" placeholder="correo@mail.com"></div>
+      <div><label>Celular</label><input class="req-celular" type="text" placeholder="3816246448"></div>
+    </div>
+  `;
+  document.getElementById('requirenteList').appendChild(div);
+}
+
+// ─── ABOGADO ──────────────────────────────────────────────────────────────────
+function onAbogadoChange() {
+  const v = document.getElementById('abogadoSelect').value;
+  const manual = document.getElementById('abogadoManual');
+  if (v === 'manual') {
+    manual.style.display = 'block';
+    // limpiar campos
+    ['abogNombre','abogMat','abogLibro','abogCasillero','abogCelular','abogEmail'].forEach(id => document.getElementById(id).value = '');
+  } else {
+    manual.style.display = 'none';
+    if (v !== '') {
+      const a = ABOGADOS[+v];
+      // pre-fill hidden for reference (no mostrar, usamos select)
+    }
+  }
+}
+
+function getAbogado() {
+  const v = document.getElementById('abogadoSelect').value;
+  const caracter = document.getElementById('abogCaracter').value;
+  if (v === 'manual') {
+    return {
+      titulo:    document.getElementById('abogTitulo').value,
+      nombre:    document.getElementById('abogNombre').value.trim(),
+      mat:       document.getElementById('abogMat').value.trim(),
+      libro:     document.getElementById('abogLibro').value.trim(),
+      casillero: document.getElementById('abogCasillero').value.trim(),
+      celular:   document.getElementById('abogCelular').value.trim(),
+      email:     document.getElementById('abogEmail').value.trim(),
+      caracter,
+    };
+  }
+  return { ...ABOGADOS[+v], caracter };
+}
+
+// ─── REQUERIDO ────────────────────────────────────────────────────────────────
+function addRequerido() {
+  const id = ++requeridosCount;
+  const div = document.createElement('div');
+  div.className = 'block';
+  div.id = 'reqBlock'+id;
+
+  // Build options
+  let opts = '<option value="">— Seleccionar empresa —</option><option value="manual">Ingresar manualmente</option>';
+  REQUERIDOS_GRUPOS.forEach(g => {
+    opts += `<optgroup label="${g.grupo}">`;
+    g.items.forEach((r, idx) => {
+      const fi = REQUERIDOS_FLAT.indexOf(r);
+      opts += `<option value="${fi}">${r.razon}</option>`;
+    });
+    opts += '</optgroup>';
+  });
+
+  div.innerHTML = `
+    <div class="block-title">Requerido ${id}</div>
+    <button class="remove-btn" onclick="removeBlock('reqBlock${id}','requeridosCount')" title="Eliminar">✕</button>
+    <label>Empresa</label>
+    <select class="req-empresa-sel" onchange="onRequeridoChange(this,'reqManual${id}','reqBadge${id}')">
+      ${opts}
+    </select>
+    <span class="req-group-badge" id="reqBadge${id}" style="display:none"></span>
+    <div id="reqManual${id}" class="manual-fields" style="display:none">
+      <label>Razón Social</label>
+      <input class="req-razon" type="text" placeholder="Razón social completa">
+      <div class="row">
+        <div><label>CUIT</label><input class="req-cuit" type="text" placeholder="30-00000000-0"></div>
+        <div style="flex:2"><label>Domicilio</label><input class="req-dom" type="text" placeholder="Calle 123 Piso X"></div>
+      </div>
+      <div class="row">
+        <div style="flex:2"><label>Localidad</label><input class="req-loc" type="text" placeholder="Ciudad Autónoma de Buenos Aires"></div>
+        <div><label>CP</label><input class="req-cp" type="text" placeholder="1001"></div>
+      </div>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <div><label>Celular</label><input class="req-tel" type="text" placeholder="no se conoce"></div>
+      <div><label>Correo electrónico</label><input class="req-mail" type="text" placeholder="no se conoce"></div>
+    </div>
+  `;
+  document.getElementById('requeridoList').appendChild(div);
+}
+
+function onRequeridoChange(sel, manualId, badgeId) {
+  const v = sel.value;
+  const manual = document.getElementById(manualId);
+  const badge  = document.getElementById(badgeId);
+  if (v === 'manual') {
+    manual.style.display = 'block';
+    badge.style.display = 'none';
+  } else if (v !== '') {
+    manual.style.display = 'none';
+    badge.textContent = REQUERIDOS_FLAT[+v].grupo;
+    badge.style.display = 'inline-block';
+  } else {
+    manual.style.display = 'none';
+    badge.style.display = 'none';
+  }
+}
+
+function getRequeridos() {
+  const blocks = document.querySelectorAll('#requeridoList .block');
+  return Array.from(blocks).map(b => {
+    const sel = b.querySelector('.req-empresa-sel').value;
+    let r;
+    if (sel === 'manual') {
+      r = {
+        razon: b.querySelector('.req-razon').value.trim(),
+        cuit:  b.querySelector('.req-cuit').value.trim(),
+        dom:   b.querySelector('.req-dom').value.trim(),
+        loc:   b.querySelector('.req-loc').value.trim(),
+        cp:    b.querySelector('.req-cp').value.trim(),
+      };
+    } else {
+      r = { ...REQUERIDOS_FLAT[+sel] };
+      r.dom = r.dom || '';
+    }
+    r.tel  = b.querySelector('.req-tel').value.trim()  || 'no se conoce';
+    r.mail = b.querySelector('.req-mail').value.trim() || 'no se conoce';
+    return r;
+  });
+}
+
+function getRequirentes() {
+  const blocks = document.querySelectorAll('#requirenteList .block');
+  return Array.from(blocks).map(b => ({
+    nombre:    b.querySelector('.req-nombre').value.trim(),
+    dni:       b.querySelector('.req-dni').value.trim(),
+    domicilio: b.querySelector('.req-domicilio').value.trim(),
+    email:     b.querySelector('.req-email').value.trim(),
+    celular:   b.querySelector('.req-celular').value.trim(),
+  }));
+}
+
+// ─── MOTIVO ───────────────────────────────────────────────────────────────────
+function onMotivoChange() {
+  const v = document.getElementById('motivoSelect').value;
+  const libre = document.getElementById('motivoLibre');
+  libre.style.display = (v === 'otro') ? 'block' : 'none';
+}
+
+function getMotivo() {
+  const v = document.getElementById('motivoSelect').value;
+  if (v === 'otro') return document.getElementById('motivoLibre').value.trim();
+  return v;
+}
+
+// ─── REMOVE BLOCK ─────────────────────────────────────────────────────────────
+function removeBlock(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+// ─── GENERAR DOCX ─────────────────────────────────────────────────────────────
+async function generarDocx() {
+  if (!validateStep(4)) return;
+
+  const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
+          AlignmentType, WidthType, BorderStyle, ShadingType, VerticalAlign,
+          HeadingLevel } = docx;
+
+  const requirentes = getRequirentes();
+  const abogado     = getAbogado();
+  const requeridos  = getRequeridos();
+  const fuero       = document.getElementById('fuero').value.trim();
+  const objeto      = document.getElementById('objeto').value.trim();
+  const motivo      = getMotivo();
+  const monto       = document.getElementById('monto').value.trim();
+  const obs         = document.getElementById('observaciones').value.trim();
+
+  // Helper fonts
+  const FONT = 'Times New Roman';
+  const SZ = 20; // 10pt
+  const SZ_SM = 18; // 9pt
+  const BLUE_FILL = '17375E';
+  const GRAY_FILL = 'D9E1F2';
+
+  const border1 = { style: BorderStyle.SINGLE, size: 4, color: '000000' };
+  const allBorders = { top: border1, bottom: border1, left: border1, right: border1 };
+
+  function txt(text, opts = {}) {
+    return new TextRun({ text, font: FONT, size: opts.size || SZ, bold: opts.bold, color: opts.color, ...opts });
+  }
+
+  function para(children, opts = {}) {
+    return new Paragraph({ children, alignment: opts.align || AlignmentType.LEFT, spacing: { before: opts.before || 0, after: opts.after || 60 }, ...opts });
+  }
+
+  function cell(children, opts = {}) {
+    return new TableCell({
+      children: Array.isArray(children) ? children : [para([txt(children, { bold: opts.bold, color: opts.color, size: opts.size || SZ_SM })], { align: opts.align || AlignmentType.LEFT })],
+      width: opts.width ? { size: opts.width, type: WidthType.DXA } : undefined,
+      shading: opts.fill ? { fill: opts.fill, type: ShadingType.CLEAR } : undefined,
+      borders: allBorders,
+      margins: { top: 60, bottom: 60, left: 100, right: 100 },
+      verticalAlign: VerticalAlign.CENTER,
+      columnSpan: opts.span,
+    });
+  }
+
+  // ── HEADER TABLE ─────────────────────────────────────────────────────────────
+  const headerTable = new Table({
+    width: { size: 9360, type: WidthType.DXA },
+    columnWidths: [6240, 3120],
+    rows: [
+      new TableRow({ children: [
+        cell([
+          para([txt('CENTRO DE MEDIACIÓN JUDICIAL', { bold: true, color: 'FFFFFF', size: 24 })], { align: AlignmentType.CENTER }),
+          para([txt('PODER JUDICIAL DE TUCUMÁN',    { bold: true, color: 'FFFFFF', size: 22 })], { align: AlignmentType.CENTER }),
+        ], { fill: BLUE_FILL, width: 6240 }),
+        cell([
+          para([txt('F.M. 1', { bold: true, color: 'FFFFFF', size: 28 })], { align: AlignmentType.CENTER }),
+          para([txt('FORMULARIO ELECTRÓNICO DE', { bold: true, color: 'FFFFFF', size: 16 })], { align: AlignmentType.CENTER }),
+          para([txt('MEDIACIÓN CIVIL (LEY 7.844)', { bold: true, color: 'FFFFFF', size: 16 })], { align: AlignmentType.CENTER }),
+        ], { fill: BLUE_FILL, width: 3120 }),
+      ]}),
+    ],
+  });
+
+  // ── INTRO ─────────────────────────────────────────────────────────────────────
+  const intro = para([
+    txt('Vengo a requerir se ponga en marcha el procedimiento de mediación prescripto por la Ley Nº 7.844 y su Decreto Reglamentario:', { size: SZ }),
+  ], { before: 160, after: 80 });
+
+  // ── REQUIRENTE SECTION ────────────────────────────────────────────────────────
+  const reqTitle = para([txt('DATOS DE LA PARTE REQUIRENTE:', { bold: true, size: SZ })], { before: 80, after: 60 });
+
+  const reqLines = [];
+  requirentes.forEach((r, i) => {
+    const label = requirentes.length > 1 ? `${i + 1}. ` : '';
+    reqLines.push(para([
+      txt(`${label}${r.nombre}`, { bold: true, size: SZ }),
+      txt(`, DNI ${r.dni}, con domicilio en ${r.domicilio}`, { size: SZ }),
+      ...(r.email  ? [txt(`, e-mail ${r.email}`,   { size: SZ })] : []),
+      ...(r.celular ? [txt(`, celular ${r.celular}`, { size: SZ })] : []),
+    ], { after: 40 }));
+  });
+
+  const casillero = abogado.casillero || '';
+  const casilleroLine = para([
+    txt('Fijo Domicilio Procesal En Casillero Digital De Notificaciones: ', { bold: true, size: SZ }),
+    txt(casillero, { size: SZ }),
+  ], { after: 40 });
+
+  const abogLines = [
+    para([txt('Nombre Y Apellido Del Abogado: ', { bold: true, size: SZ }), txt(`${abogado.titulo} ${abogado.nombre}`, { size: SZ })], { after: 40 }),
+    para([txt('Carácter: ', { bold: true, size: SZ }), txt(abogado.caracter, { size: SZ })], { after: 40 }),
+    para([txt('Celular Del Abogado: ', { bold: true, size: SZ }), txt(abogado.celular || '—', { size: SZ })], { after: 40 }),
+    para([txt('Correo Electrónico Del Abogado: ', { bold: true, size: SZ }), txt(abogado.email || '—', { size: SZ })], { after: 60 }),
+  ];
+
+  // ── PROCESO ───────────────────────────────────────────────────────────────────
+  const procTitle = para([txt('INFORMACIÓN SOBRE EL PROCESO:', { bold: true, size: SZ })], { before: 80, after: 60 });
+  const procLines = [
+    para([txt('* EL RECLAMO CORRESPONDE AL FUERO: ', { bold: true, size: SZ }), txt(fuero, { size: SZ })], { after: 40 }),
+    para([txt('* OBJETO (PROCESAL): ', { bold: true, size: SZ }), txt(objeto, { size: SZ })], { after: 40 }),
+    para([txt('* CAUSA (DESCRIBIR BREVEMENTE EL CASO): ', { bold: true, size: SZ }), txt(motivo, { size: SZ })], { after: 40 }),
+    para([txt('* MONTO ESTIMADO RECLAMADO: ', { bold: true, size: SZ }), txt(monto || '', { size: SZ })], { after: 60 }),
+  ];
+
+  // ── REQUERIDOS TABLE ──────────────────────────────────────────────────────────
+  const reqTitle2 = para([txt('DATOS DE LA PARTE REQUERIDA:', { bold: true, size: SZ })], { before: 80, after: 60 });
+
+  const HDR_COLOR = '000000';
+  const headerRow = new TableRow({
+    tableHeader: true,
+    children: [
+      cell('RAZON SOCIAL',   { fill: GRAY_FILL, bold: true, width: 3200, align: AlignmentType.CENTER, color: HDR_COLOR }),
+      cell('CUIT',           { fill: GRAY_FILL, bold: true, width: 1300, align: AlignmentType.CENTER, color: HDR_COLOR }),
+      cell('DOMICILIO',      { fill: GRAY_FILL, bold: true, width: 2300, align: AlignmentType.CENTER, color: HDR_COLOR }),
+      cell('LOCALIDAD',      { fill: GRAY_FILL, bold: true, width: 1760, align: AlignmentType.CENTER, color: HDR_COLOR }),
+      cell('CP',             { fill: GRAY_FILL, bold: true, width:  800, align: AlignmentType.CENTER, color: HDR_COLOR }),
+    ],
+  });
+
+  const dataRows = requeridos.map(r => new TableRow({ children: [
+    cell(r.razon || '', { width: 3200, size: SZ_SM }),
+    cell(r.cuit  || '', { width: 1300, size: SZ_SM, align: AlignmentType.CENTER }),
+    cell(r.dom   || '', { width: 2300, size: SZ_SM }),
+    cell(r.loc   || '', { width: 1760, size: SZ_SM }),
+    cell(r.cp    || '', { width:  800, size: SZ_SM, align: AlignmentType.CENTER }),
+  ]}));
+
+  const reqTable = new Table({
+    width: { size: 9360, type: WidthType.DXA },
+    columnWidths: [3200, 1300, 2300, 1760, 800],
+    rows: [headerRow, ...dataRows],
+  });
+
+  // Contact lines per requerido
+  const contactLines = [];
+  requeridos.forEach(r => {
+    contactLines.push(
+      para([txt('* ', { bold: true, size: SZ }), txt('CELULAR', { bold: true, size: SZ }), txt(`: ${r.tel}`, { size: SZ })], { after: 30 }),
+      para([txt('* ', { bold: true, size: SZ }), txt('CORREO ELECTRÓNICO', { bold: true, size: SZ }), txt(`: ${r.mail}`, { size: SZ })], { after: 40 }),
+    );
+  });
+
+  // ── OBSERVACIONES ────────────────────────────────────────────────────────────
+  const obsSection = obs ? [
+    para([txt('Observaciones: ', { bold: true, size: SZ }), txt(obs, { size: SZ })], { before: 60, after: 60 }),
+  ] : [];
+
+  // ── DISCLAIMER ────────────────────────────────────────────────────────────────
+  const disclaimer = [
+    para([txt('El Mediador será designado por sorteo de la lista de mediadores inscriptos en el Registro de Mediadores (art. 8° de la Ley 7.844. modificada por Ley 8.482) que estuvieran en condiciones de celebrar audiencias de mediación con modalidad a distancia.', { size: SZ_SM })], { before: 80, after: 60 }),
+    para([txt('Solicitamos indicar en el ítem «observaciones» la existencia de condiciones que requieran un trámite de adecuación (ej.: necesidad de intérprete en lenguaje de señas, etc.).', { size: SZ_SM })], { after: 60 }),
+    para([txt('Con el envío del presente formulario declaro que conozco y asumo la obligación de reponer tasa de justicia de inicio del proceso de mediación, una vez reabiertos los plazos procesales.', { size: SZ_SM })], { after: 60 }),
+    para([txt('Asimismo, declaro que los datos consignados en este formulario son correctos y completos y que no se ha omitido ni falseado información que deba contener esta declaración.', { size: SZ_SM })], { after: 100 }),
+  ];
+
+  // ── FIRMA ─────────────────────────────────────────────────────────────────────
+  const firma = [
+    para([txt(`${abogado.titulo} ${abogado.nombre}`, { bold: true, size: SZ })], { align: AlignmentType.CENTER, before: 80 }),
+    para([txt(`     Mat. Prof. ${abogado.mat}`, { size: SZ })], { align: AlignmentType.CENTER, after: 60 }),
+  ];
+
+  // ── ASSEMBLE ──────────────────────────────────────────────────────────────────
+  const doc = new Document({
+    sections: [{
+      properties: {
+        page: {
+          size: { width: 11906, height: 16838 }, // A4
+          margin: { top: 720, right: 720, bottom: 720, left: 720 },
+        },
+      },
+      children: [
+        headerTable,
+        intro,
+        reqTitle,
+        ...reqLines,
+        casilleroLine,
+        ...abogLines,
+        procTitle,
+        ...procLines,
+        reqTitle2,
+        reqTable,
+        ...contactLines,
+        ...obsSection,
+        ...disclaimer,
+        ...firma,
+      ],
+    }],
+  });
+
+  const buffer = await Packer.toBuffer(doc);
+  const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+  lastBlob = blob;
+
+  // Filename: FM1_Apellido_Requerido.docx
+  const apellido = requirentes[0].nombre.split(' ').pop();
+  const fileName = `FM1_${apellido}_Mediacion.docx`;
+
+  triggerDownload(blob, fileName);
+
+  // Show success
+  document.getElementById('step4').style.display = 'none';
+  document.getElementById('s4').classList.add('done');
+  document.getElementById('successPanel').style.display = 'block';
+  document.getElementById('btnRedescargar').onclick = () => triggerDownload(lastBlob, fileName);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function triggerDownload(blob, name) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+// ─── NUEVA MEDIACIÓN ─────────────────────────────────────────────────────────
+function nuevaMediacion() {
+  document.getElementById('requirenteList').innerHTML = '';
+  document.getElementById('requeridoList').innerHTML = '';
+  requirentesCount = 0;
+  requeridosCount  = 0;
+  lastBlob = null;
+  document.getElementById('monto').value = '';
+  document.getElementById('observaciones').value = 'Se solicita se otorgue beneficio art. 53 ley 24.240 por tratarse de Proceso de Consumo.';
+  document.getElementById('motivoSelect').value = '';
+  document.getElementById('motivoLibre').style.display = 'none';
+  document.getElementById('abogadoSelect').value = '';
+  document.getElementById('abogadoManual').style.display = 'none';
+  document.getElementById('fuero').value = 'Civil y Comercial Común';
+  document.getElementById('objeto').value = 'Proceso de consumo';
+  document.getElementById('successPanel').style.display = 'none';
+  // Reset steps UI
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById('s'+i).classList.remove('active','done');
+    document.getElementById('step'+i).style.display = 'none';
+  }
+  currentStep = 1;
+  document.getElementById('s1').classList.add('active');
+  document.getElementById('step1').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+addRequirente();
+addRequerido();
+</script>
+</body>
+</html>
