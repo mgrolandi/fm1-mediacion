@@ -418,11 +418,12 @@ function addRequerido() {
 
   // Build options
   let opts = '<option value="">— Seleccionar empresa —</option><option value="manual">Ingresar manualmente</option>';
+  let flatIdx = 0;
   REQUERIDOS_GRUPOS.forEach(g => {
     opts += `<optgroup label="${g.grupo}">`;
-    g.items.forEach((r, idx) => {
-      const fi = REQUERIDOS_FLAT.indexOf(r);
-      opts += `<option value="${fi}">${r.razon}</option>`;
+    g.items.forEach(r => {
+      opts += `<option value="${flatIdx}">${r.razon}</option>`;
+      flatIdx++;
     });
     opts += '</optgroup>';
   });
@@ -551,26 +552,23 @@ function verPrevia() {
   const obs         = document.getElementById('observaciones').value.trim();
 
   const reqLines = requirentes.map((r, i) => {
-    const label = requirentes.length > 1 ? `${i + 1}. ` : '';
-    let line = `<b>${label}${r.nombre}</b>, DNI ${r.dni}, con domicilio en ${r.domicilio}`;
-    if (r.email)   line += `, e-mail ${r.email}`;
-    if (r.celular) line += `, celular ${r.celular}`;
-    return `<p style="margin:0 0 5px">${line}</p>`;
+    const num = requirentes.length > 1 ? `${i + 1}. ` : '';
+    return `
+      <p style="margin:4pt 0 2pt"><b>${num}${r.nombre}</b>, DNI ${r.dni}</p>
+      <p style="margin:1pt 0 1pt;padding-left:12pt"><b>Domicilio:</b> ${r.domicilio}</p>
+      ${r.email   ? `<p style="margin:1pt 0 1pt;padding-left:12pt"><b>Email:</b> ${r.email}</p>` : ''}
+      ${r.celular ? `<p style="margin:1pt 0 5pt;padding-left:12pt"><b>Celular:</b> ${r.celular}</p>` : ''}`;
   }).join('');
 
-  const reqRows = requeridos.map(r => `
-    <tr>
-      <td>${r.razon || ''}</td>
-      <td style="text-align:center">${r.cuit || ''}</td>
-      <td>${r.dom || ''}</td>
-      <td>${r.loc || ''}</td>
-      <td style="text-align:center">${r.cp || ''}</td>
-    </tr>`).join('');
-
-  const contactLines = requeridos.map(r =>
-    `<p style="margin:2px 0"><b>* CELULAR</b>: ${r.tel}</p>` +
-    `<p style="margin:2px 0"><b>* CORREO ELECTRÓNICO</b>: ${r.mail}</p>`
-  ).join('');
+  const requeridoItems = requeridos.map((r, i) => {
+    const num = requeridos.length > 1 ? `${i + 1}. ` : '';
+    return `
+      <p style="margin:6pt 0 2pt"><b>${num}${r.razon || ''}</b></p>
+      <p style="margin:1pt 0 1pt;padding-left:12pt"><b>CUIT:</b> ${r.cuit || ''}</p>
+      <p style="margin:1pt 0 1pt;padding-left:12pt"><b>Domicilio:</b> ${r.dom || ''}, ${r.loc || ''} (CP: ${r.cp || ''})</p>
+      <p style="margin:1pt 0 1pt;padding-left:12pt"><b>Celular:</b> ${r.tel}</p>
+      <p style="margin:1pt 0 6pt;padding-left:12pt"><b>Correo electrónico:</b> ${r.mail}</p>`;
+  }).join('');
 
   document.getElementById('previewContent').innerHTML = `
     <table style="margin-bottom:10pt">
@@ -604,17 +602,7 @@ function verPrevia() {
     <p style="margin:4pt 0"><b>* MONTO ESTIMADO RECLAMADO:</b> ${monto}</p>
 
     <p style="margin:10pt 0 4pt"><b>DATOS DE LA PARTE REQUERIDA:</b></p>
-    <table style="font-size:9pt;margin-bottom:6pt">
-      <tr style="background:#D9E1F2">
-        <th style="text-align:center">RAZON SOCIAL</th>
-        <th style="text-align:center">CUIT</th>
-        <th style="text-align:center">DOMICILIO</th>
-        <th style="text-align:center">LOCALIDAD</th>
-        <th style="text-align:center">CP</th>
-      </tr>
-      ${reqRows}
-    </table>
-    ${contactLines}
+    ${requeridoItems}
 
     ${obs ? `<p style="margin:8pt 0 4pt"><b>Observaciones:</b> ${obs}</p>` : ''}
 
