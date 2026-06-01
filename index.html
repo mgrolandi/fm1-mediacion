@@ -72,6 +72,17 @@
     .row{flex-direction:column;gap:0}
     .steps::before{left:5%;right:5%}
   }
+  /* Preview */
+  .preview-actions{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+  .preview-doc{background:#fff;font-family:'Times New Roman',Times,serif;font-size:10pt;line-height:1.5;max-width:21cm;margin:0 auto;padding:1.5cm;border:1px solid #ccc;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+  .preview-doc table{border-collapse:collapse;width:100%}
+  .preview-doc td,.preview-doc th{border:1px solid #000;padding:4px 6px;vertical-align:top}
+  @media print{
+    body>.container>*:not(#previewPanel){display:none!important}
+    #previewPanel{display:block!important}
+    .preview-actions{display:none!important}
+    .preview-doc{border:none;box-shadow:none;padding:0;margin:0;max-width:none}
+  }
 </style>
 </head>
 <body>
@@ -204,8 +215,19 @@
     </div>
     <div class="nav">
       <button class="btn btn-secondary" onclick="goStep(3)">← Anterior</button>
-      <button class="btn btn-success" onclick="generarDocx()">⬇ Generar FM1.docx</button>
+      <button class="btn btn-success" onclick="verPrevia()">👁 Vista Previa / Imprimir</button>
+      <button class="btn btn-primary" onclick="generarDocx()">⬇ Generar .docx</button>
     </div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div id="previewPanel" style="display:none">
+    <div class="preview-actions">
+      <button class="btn btn-success" onclick="window.print()">🖨 Imprimir / Guardar PDF</button>
+      <button class="btn btn-secondary" onclick="volverDesdePrevia()">← Volver al formulario</button>
+      <button class="btn btn-new" onclick="generarDocx()">⬇ Descargar .docx</button>
+    </div>
+    <div id="previewContent" class="preview-doc"></div>
   </div>
 
   <!-- SUCCESS -->
@@ -513,6 +535,106 @@ function getMotivo() {
 function removeBlock(id) {
   const el = document.getElementById(id);
   if (el) el.remove();
+}
+
+// ─── VISTA PREVIA ─────────────────────────────────────────────────────────────
+function verPrevia() {
+  if (!validateStep(4)) return;
+
+  const requirentes = getRequirentes();
+  const abogado     = getAbogado();
+  const requeridos  = getRequeridos();
+  const fuero       = document.getElementById('fuero').value.trim();
+  const objeto      = document.getElementById('objeto').value.trim();
+  const motivo      = getMotivo();
+  const monto       = document.getElementById('monto').value.trim();
+  const obs         = document.getElementById('observaciones').value.trim();
+
+  const reqLines = requirentes.map((r, i) => {
+    const label = requirentes.length > 1 ? `${i + 1}. ` : '';
+    let line = `<b>${label}${r.nombre}</b>, DNI ${r.dni}, con domicilio en ${r.domicilio}`;
+    if (r.email)   line += `, e-mail ${r.email}`;
+    if (r.celular) line += `, celular ${r.celular}`;
+    return `<p style="margin:0 0 5px">${line}</p>`;
+  }).join('');
+
+  const reqRows = requeridos.map(r => `
+    <tr>
+      <td>${r.razon || ''}</td>
+      <td style="text-align:center">${r.cuit || ''}</td>
+      <td>${r.dom || ''}</td>
+      <td>${r.loc || ''}</td>
+      <td style="text-align:center">${r.cp || ''}</td>
+    </tr>`).join('');
+
+  const contactLines = requeridos.map(r =>
+    `<p style="margin:2px 0"><b>* CELULAR</b>: ${r.tel}</p>` +
+    `<p style="margin:2px 0"><b>* CORREO ELECTRÓNICO</b>: ${r.mail}</p>`
+  ).join('');
+
+  document.getElementById('previewContent').innerHTML = `
+    <table style="margin-bottom:10pt">
+      <tr>
+        <td style="background:#17375E;color:#fff;text-align:center;padding:10px;width:66%;border:none">
+          <div style="font-size:13pt;font-weight:bold">CENTRO DE MEDIACIÓN JUDICIAL</div>
+          <div style="font-size:11pt;font-weight:bold">PODER JUDICIAL DE TUCUMÁN</div>
+        </td>
+        <td style="background:#17375E;color:#fff;text-align:center;padding:10px;width:34%;border:none">
+          <div style="font-size:18pt;font-weight:bold">F.M. 1</div>
+          <div style="font-size:8pt;font-weight:bold">FORMULARIO ELECTRÓNICO DE</div>
+          <div style="font-size:8pt;font-weight:bold">MEDIACIÓN CIVIL (LEY 7.844)</div>
+        </td>
+      </tr>
+    </table>
+
+    <p style="margin:0 0 8pt">Vengo a requerir se ponga en marcha el procedimiento de mediación prescripto por la Ley Nº 7.844 y su Decreto Reglamentario:</p>
+
+    <p style="margin:0 0 4pt"><b>DATOS DE LA PARTE REQUIRENTE:</b></p>
+    ${reqLines}
+    <p style="margin:4pt 0"><b>Fijo Domicilio Procesal En Casillero Digital De Notificaciones:</b> ${abogado.casillero || ''}</p>
+    <p style="margin:4pt 0"><b>Nombre Y Apellido Del Abogado:</b> ${abogado.titulo} ${abogado.nombre}</p>
+    <p style="margin:4pt 0"><b>Carácter:</b> ${abogado.caracter}</p>
+    <p style="margin:4pt 0"><b>Celular Del Abogado:</b> ${abogado.celular || '—'}</p>
+    <p style="margin:4pt 0"><b>Correo Electrónico Del Abogado:</b> ${abogado.email || '—'}</p>
+
+    <p style="margin:10pt 0 4pt"><b>INFORMACIÓN SOBRE EL PROCESO:</b></p>
+    <p style="margin:4pt 0"><b>* EL RECLAMO CORRESPONDE AL FUERO:</b> ${fuero}</p>
+    <p style="margin:4pt 0"><b>* OBJETO (PROCESAL):</b> ${objeto}</p>
+    <p style="margin:4pt 0"><b>* CAUSA (DESCRIBIR BREVEMENTE EL CASO):</b> ${motivo}</p>
+    <p style="margin:4pt 0"><b>* MONTO ESTIMADO RECLAMADO:</b> ${monto}</p>
+
+    <p style="margin:10pt 0 4pt"><b>DATOS DE LA PARTE REQUERIDA:</b></p>
+    <table style="font-size:9pt;margin-bottom:6pt">
+      <tr style="background:#D9E1F2">
+        <th style="text-align:center">RAZON SOCIAL</th>
+        <th style="text-align:center">CUIT</th>
+        <th style="text-align:center">DOMICILIO</th>
+        <th style="text-align:center">LOCALIDAD</th>
+        <th style="text-align:center">CP</th>
+      </tr>
+      ${reqRows}
+    </table>
+    ${contactLines}
+
+    ${obs ? `<p style="margin:8pt 0 4pt"><b>Observaciones:</b> ${obs}</p>` : ''}
+
+    <p style="margin:10pt 0 4pt;font-size:9pt">El Mediador será designado por sorteo de la lista de mediadores inscriptos en el Registro de Mediadores (art. 8° de la Ley 7.844. modificada por Ley 8.482) que estuvieran en condiciones de celebrar audiencias de mediación con modalidad a distancia.</p>
+    <p style="margin:4pt 0;font-size:9pt">Solicitamos indicar en el ítem «observaciones» la existencia de condiciones que requieran un trámite de adecuación (ej.: necesidad de intérprete en lenguaje de señas, etc.).</p>
+    <p style="margin:4pt 0;font-size:9pt">Con el envío del presente formulario declaro que conozco y asumo la obligación de reponer tasa de justicia de inicio del proceso de mediación, una vez reabiertos los plazos procesales.</p>
+    <p style="margin:4pt 0;font-size:9pt">Asimismo, declaro que los datos consignados en este formulario son correctos y completos y que no se ha omitido ni falseado información que deba contener esta declaración.</p>
+
+    <p style="text-align:center;margin:20pt 0 4pt;font-weight:bold">${abogado.titulo} ${abogado.nombre}</p>
+    <p style="text-align:center;margin:0">Mat. Prof. ${abogado.mat}</p>
+  `;
+
+  document.getElementById('step4').style.display = 'none';
+  document.getElementById('previewPanel').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function volverDesdePrevia() {
+  document.getElementById('previewPanel').style.display = 'none';
+  document.getElementById('step4').style.display = 'block';
 }
 
 // ─── GENERAR DOCX ─────────────────────────────────────────────────────────────
