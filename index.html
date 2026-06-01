@@ -111,6 +111,7 @@
         <option value="2">Dra. María Gabriela Rolandi (Mat. 4406)</option>
       </optgroup>
     </select>
+    <div id="abogadoPreview" style="display:none;margin-top:10px;padding:10px;background:#f0f4ff;border:1.5px solid #c7d4f0;border-radius:6px;font-size:.82rem;line-height:1.9"></div>
     <div id="abogadoManual" class="manual-fields" style="display:none">
       <div class="row">
         <div>
@@ -346,17 +347,25 @@ function addRequirente() {
 // ─── ABOGADO ──────────────────────────────────────────────────────────────────
 function onAbogadoChange() {
   const v = document.getElementById('abogadoSelect').value;
-  const manual = document.getElementById('abogadoManual');
+  const manual  = document.getElementById('abogadoManual');
+  const preview = document.getElementById('abogadoPreview');
   if (v === 'manual') {
     manual.style.display = 'block';
-    // limpiar campos
+    preview.style.display = 'none';
     ['abogNombre','abogMat','abogLibro','abogCasillero','abogCelular','abogEmail'].forEach(id => document.getElementById(id).value = '');
+  } else if (v !== '') {
+    manual.style.display = 'none';
+    const a = ABOGADOS[+v];
+    preview.innerHTML =
+      `<strong>${a.titulo} ${a.nombre}</strong><br>` +
+      `Mat. ${a.mat} &nbsp;·&nbsp; ${a.libro}<br>` +
+      `Casillero: ${a.casillero}` +
+      (a.celular ? `<br>Cel: ${a.celular}` : '') +
+      (a.email   ? `<br>${a.email}` : '');
+    preview.style.display = 'block';
   } else {
     manual.style.display = 'none';
-    if (v !== '') {
-      const a = ABOGADOS[+v];
-      // pre-fill hidden for reference (no mostrar, usamos select)
-    }
+    preview.style.display = 'none';
   }
 }
 
@@ -400,10 +409,11 @@ function addRequerido() {
     <div class="block-title">Requerido ${id}</div>
     <button class="remove-btn" onclick="removeBlock('reqBlock${id}','requeridosCount')" title="Eliminar">✕</button>
     <label>Empresa</label>
-    <select class="req-empresa-sel" onchange="onRequeridoChange(this,'reqManual${id}','reqBadge${id}')">
+    <select class="req-empresa-sel" onchange="onRequeridoChange(this,'reqManual${id}','reqBadge${id}','reqPreview${id}')">
       ${opts}
     </select>
     <span class="req-group-badge" id="reqBadge${id}" style="display:none"></span>
+    <div id="reqPreview${id}" style="display:none;margin-top:8px;padding:10px;background:#f0f4ff;border:1.5px solid #c7d4f0;border-radius:6px;font-size:.82rem;line-height:1.9"></div>
     <div id="reqManual${id}" class="manual-fields" style="display:none">
       <label>Razón Social</label>
       <input class="req-razon" type="text" placeholder="Razón social completa">
@@ -424,20 +434,31 @@ function addRequerido() {
   document.getElementById('requeridoList').appendChild(div);
 }
 
-function onRequeridoChange(sel, manualId, badgeId) {
-  const v = sel.value;
-  const manual = document.getElementById(manualId);
-  const badge  = document.getElementById(badgeId);
+function onRequeridoChange(sel, manualId, badgeId, previewId) {
+  const v       = sel.value;
+  const manual  = document.getElementById(manualId);
+  const badge   = document.getElementById(badgeId);
+  const preview = document.getElementById(previewId);
   if (v === 'manual') {
     manual.style.display = 'block';
     badge.style.display = 'none';
+    if (preview) preview.style.display = 'none';
   } else if (v !== '') {
     manual.style.display = 'none';
-    badge.textContent = REQUERIDOS_FLAT[+v].grupo;
+    const r = REQUERIDOS_FLAT[+v];
+    badge.textContent = r.grupo;
     badge.style.display = 'inline-block';
+    if (preview) {
+      preview.innerHTML =
+        `<strong>CUIT:</strong> ${r.cuit}<br>` +
+        `<strong>Domicilio:</strong> ${r.dom}<br>` +
+        `<strong>Localidad:</strong> ${r.loc} (CP: ${r.cp})`;
+      preview.style.display = 'block';
+    }
   } else {
     manual.style.display = 'none';
     badge.style.display = 'none';
+    if (preview) preview.style.display = 'none';
   }
 }
 
@@ -709,7 +730,10 @@ function triggerDownload(blob, name) {
   const a = document.createElement('a');
   a.href = url;
   a.download = name;
+  a.style.display = 'none';
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 5000);
 }
 
