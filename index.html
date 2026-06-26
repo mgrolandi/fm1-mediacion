@@ -818,8 +818,7 @@ async function generarDocx() {
     }],
   });
 
-  const buffer = await Packer.toBuffer(doc);
-  const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+  const blob = await Packer.toBlob(doc);
   lastBlob = blob;
 
   // Filename: FM1_Apellido_Requerido.docx
